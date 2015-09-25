@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <ul id="messages"></ul>
+    <form action="">
+      <!--
+	  <input id="m" autocomplete="off" /><button>Send</button>
+      -->
+	</form>
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io();
+</script>
+<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+  var socket = io();
+  // Temp var for parsing incoming msgs
+  
+/*  
+  var MongoClient = require('mongodb').MongoClient
+  , assert = require('assert');
+
+  // Connection URL
+  var url = 'mongodb://localhost:27017/dbTest';
+  // Use connect method to connect to the Server
+  MongoClient.connect(url, function(err, db) {
+  assert.equal(null, err);
+  //console.log("Connected correctly to server");	
+  $('#messages').append($('<li>').text("hahaha"));
+  db.close();
+});
+  */
+  
+  
+  
+  var temp_ID;
+  var temp_temperature;
+  
+  var average;
+  
+  // Update Status of Temperatures 
+  // 0: Pending 1: Updated
+  var update = [0, 0, 0, 0];
+  
+  // Temperatures
+  var temperature = new Array([4]);
+  
+  $('form').submit(function(){
+    socket.emit('chat message', $('#m').val());
+    $('#m').val('');
+    return false;
+  });
+  socket.on('chat message', function(msg){
+    // Handle incoming msgs
+	temp_ID = msg.substring(1, 2);
+	
+	temp_temperature = msg.substring(4, (msg.length - 1));
+	
+	// Update the status and temperature
+	temperature[ parseInt(temp_ID)] = parseFloat( temp_temperature);
+	
+	update[ parseInt(temp_ID)] = 1;
+	
+	// Print msg and the parsed msg
+	$('#messages').append($('<li>').text(msg + " ID:" + temp_ID + " Temperature:" + temp_temperature));
+	
+	/*if( (5 == 5) && (3 == 3) )
+	{
+		$('#messages').append($('<li>').text(msg));
+	}*/
+	
+	
+	// Calculate the average when we have 4 temperatures
+	if( ( update[0] == 1 ) && ( update[1] == 1) && ( update[2] == 1) && ( update[3] == 1) )
+	{
+		average = (temperature[0] + temperature[1] + temperature[2] + temperature[3]) / 4;
+		average = average.toFixed(2);
+		
+		update[0] = 0;
+		update[1] = 0;
+		update[2] = 0;
+		update[3] = 0;
+		
+		$('#messages').append($('<li>').text("==================================================="));
+		$('#messages').append($('<li>').text("Average Temperature of Sensor 0: " + temperature[0]));
+		$('#messages').append($('<li>').text("Average Temperature of Sensor 1: " + temperature[1]));
+		$('#messages').append($('<li>').text("Average Temperature of Sensor 2: " + temperature[2]));
+		$('#messages').append($('<li>').text("Average Temperature of Sensor 3: " + temperature[3]));
+		
+	// Get the current time
+		var now = new Date();
+		var hour = now.getHours();
+		var minute = now.getMinutes();
+		var second = now.getSeconds();
+		var time = hour + ':' + minute + ':' + second;
+		
+		
+		$('#messages').append($('<li>').text("====Average Temperature of All Sensors at: " + time + " is " + average + "====="));
+		$('#messages').append($('<li>').text("==================================================="));
+	}
+	
+  });
+</script>
+  </body>
+</html>
+</html>
