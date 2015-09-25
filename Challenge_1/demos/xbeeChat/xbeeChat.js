@@ -31,9 +31,13 @@ var temperature = new Array([4]);
 // Update Status of Temperatures 
 // 0: Pending 1: Updated
 var update = [0, 0, 0, 0];
-  
+
 // Temperatures
 var temperature = new Array([4]);
+
+// Coordinates
+var X = [5, 5, -5, -5];
+var Y = [5, -5, 5, -5];
 
 MongoClient = require('mongodb').MongoClient
 				, assert = require('assert');
@@ -100,10 +104,10 @@ sp.on("open", function () {
 				var collection = db.collection('test');
 
 				// Create tables
-				var message_0 = {Device_ID: 0, Temperature: temperature[0], Time: time, Time_ms: time_ms};
-				var message_1 = {Device_ID: 1, Temperature: temperature[1], Time: time, Time_ms: time_ms};
-				var message_2 = {Device_ID: 2, Temperature: temperature[2], Time: time, Time_ms: time_ms};
-				var message_3 = {Device_ID: 3, Temperature: temperature[3], Time: time, Time_ms: time_ms};
+				var message_0 = {Device_ID: 0, Temperature: temperature[0], Time: time, Time_ms: time_ms, X : X[0], Y : Y[0]};
+				var message_1 = {Device_ID: 1, Temperature: temperature[1], Time: time, Time_ms: time_ms, X : X[1], Y : Y[1]};
+				var message_2 = {Device_ID: 2, Temperature: temperature[2], Time: time, Time_ms: time_ms, X : X[2], Y : Y[2]};
+				var message_3 = {Device_ID: 3, Temperature: temperature[3], Time: time, Time_ms: time_ms, X : X[3], Y : Y[3]};
 				// Average
 				var message_A = {Device_ID: 9, Temperature: average, Time: time, Time_ms: time_ms};
 			
@@ -123,7 +127,8 @@ sp.on("open", function () {
 			});
 			
 			// Transmit the parsed data to the html
-			io.emit("chat message", '(' + temperature[0] + ')' + '(' + temperature[1] + ')' + '(' + temperature[2] + ')' + '(' + temperature[3] + ')' + '[' + average + ']' + '{' + time + '}');
+			//io.emit("chat message", '(' + temperature[0] + ')' + '(' + temperature[1] + ')' + '(' + temperature[2] + ')' + '(' + temperature[3] + ')' + '[' + average + ']' + '{' + time + '}');
+			io.emit("chat message", 'Database Updated');	
 		}
 	});
 });
