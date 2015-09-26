@@ -84,8 +84,9 @@ sp.on("open", function () {
 		if( ( update[0] == 1 ) && ( update[1] == 1) && ( update[2] == 1) && ( update[3] == 1) )
 		{
 			current = new Date();
-			time = current.toString();
-			time_ms = Date.parse(time);
+			time = current.toLocaleTimeString();
+			newTime = current.toString();
+			time_ms = Date.parse(newTime);
 			
 			average = (temperature[0] + temperature[1] + temperature[2] + temperature[3]) / 4;
 			average = parseFloat(average.toFixed(2));
@@ -121,7 +122,7 @@ sp.on("open", function () {
 					} 
 					else 
 					{
-						//console.log('Inserted %d documents into the "test" collection. The documents inserted with "_id" are:', result.length, result);
+						console.log('Inserted %d documents into the "test" collection. The documents inserted with "_id" are:', result.length, result);
 
 					}
 					
@@ -133,7 +134,7 @@ sp.on("open", function () {
 				
 				cursor.sort({Time_ms: -1});
 				
-				cursor.limit(5);
+				cursor.limit(1);
 				
 				
 				cursor.each(function(err, doc) 
@@ -142,11 +143,19 @@ sp.on("open", function () {
 					{
 						console.log(err);
 					} 
-					else 
+					if (doc != null) 
 					{
 						console.log('Fetched:', doc);
+						var temp = doc.Temperature;
+						var id = doc.Device_ID;
+						var time = doc.Time;
+						var judge = doc.Time_ms;
+						var x = doc.X;
+						var y = doc.Y;
 						
-						io.emit("chat message", doc.toArray);
+						console.log('Fetched:', judge);
+						
+						io.emit("chat message", id + '//' + time + '//' + judge + '//' + x + '//' + y + '//' + temp);
 				    }
 				
 				});
