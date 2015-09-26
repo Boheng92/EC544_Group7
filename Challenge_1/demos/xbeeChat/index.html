@@ -31,9 +31,43 @@
     $('#m').val('');
     return false;
   });
+  
   socket.on('chat message', function(msg){
     $('#messages').append($('<li>').text(msg));
-  });
+	$('#messages').append($('<li>').text('A'))
+	
+	//mongodb operation
+MongoClient = require('mongodb').MongoClient
+				, assert = require('assert');
+url = 'mongodb://localhost:27017/dbTest';
+	
+	/*var findTest = function(db, callback) 
+	{
+		$('#messages').append($('<li>').text('A'));
+		
+		var cursor =db.collection('test').find( );
+		
+		$('#messages').append($('<li>').text('B'));
+		
+		cursor.each(function(err, doc) {
+			assert.equal(err, null);
+			if (doc != null) {
+				console.dir(doc);
+			} else {
+				callback();
+			}
+		});
+	};*/
+	
+	MongoClient.connect(url, function(err, db) {
+		assert.equal(null, err);
+		$('#messages').append($('<li>').text(233));
+		/*findTest(db, function() {
+			db.close();
+			$('#messages').append($('<li>').text(233));
+		});*/
+	});
+});
 </script>
   </body>
 </html>

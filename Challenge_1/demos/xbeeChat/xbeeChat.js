@@ -39,6 +39,8 @@ var temperature = new Array([4]);
 var X = [5, 5, -5, -5];
 var Y = [5, -5, 5, -5];
 
+//var doc;
+
 MongoClient = require('mongodb').MongoClient
 				, assert = require('assert');
 
@@ -119,16 +121,42 @@ sp.on("open", function () {
 					} 
 					else 
 					{
-						console.log('Inserted %d documents into the "test" collection. The documents inserted with "_id" are:', result.length, result);
+						//console.log('Inserted %d documents into the "test" collection. The documents inserted with "_id" are:', result.length, result);
+
 					}
-			
-					db.close();
+					
+					//db.close();
 				});
-			});
+				
+				
+				var cursor =collection.find( );
+				
+				cursor.sort({Time_ms: -1});
+				
+				cursor.limit(5);
+				
+				
+				cursor.each(function(err, doc) 
+				{
+				    if (err) 
+					{
+						console.log(err);
+					} 
+					else 
+					{
+						console.log('Fetched:', doc);
+						
+						io.emit("chat message", doc.toArray);
+				    }
+				
+				});
+				
+				//db.close();
 			
-			// Transmit the parsed data to the html
-			//io.emit("chat message", '(' + temperature[0] + ')' + '(' + temperature[1] + ')' + '(' + temperature[2] + ')' + '(' + temperature[3] + ')' + '[' + average + ']' + '{' + time + '}');
-			io.emit("chat message", 'Database Updated');	
+				// Transmit the parsed data to the html
+				//io.emit("chat message", '(' + temperature[0] + ')' + '(' + temperature[1] + ')' + '(' + temperature[2] + ')' + '(' + temperature[3] + ')' + '[' + average + ']' + '{' + time + '}');
+				//io.emit("chat message", doc);	
+			});
 		}
 	});
 });
