@@ -68,18 +68,29 @@ http.listen(3000, function(){
 
 sp.on("open", function () {
 	console.log('open');
-  
+	
 	sp.on('data', function(data) {
 	
+		var msg0 = '';
+		var msg1 = '';
+		var msg2 = '';
+		var msg3 = '';
+		var msgA = '';
+		
 		// Handle received Data
 		console.log('data received: ' + data);
 	
 		// Parse data
 		deviceID = parseInt(data.substring(1, 2));
 		
-		temperature[deviceID] = parseFloat(data.substring(4, (data.length - 1)));
+		var temp_temperature = parseFloat(data.substring(4, (data.length - 1)));
+		// Ignore the invalid ones
+		if( (temp_temperature > (-100.00)) && (temp_temperature < 100.00))
+		{
+			temperature[deviceID] = temp_temperature;
 	
-		update[deviceID] = 1;
+			update[deviceID] = 1;
+		}
 	
 		if( ( update[0] == 1 ) && ( update[1] == 1) && ( update[2] == 1) && ( update[3] == 1) )
 		{
@@ -95,7 +106,13 @@ sp.on("open", function () {
 			update[1] = 0;
 			update[2] = 0;
 			update[3] = 0;
-		
+
+			//msg0 = 'ZERO::';
+			//msg1 = 'ONE::';
+			//msg2 = 'TWO::';
+			//msg3 = 'THREE::';
+			//msgA = 'AVERAGE::';
+			
 			// DB operations
 			// Use connect method to connect to the Server
 			MongoClient.connect(url, function(err, db) {
@@ -134,9 +151,8 @@ sp.on("open", function () {
 				
 				cursor.sort({Time_ms: -1});
 				
-				cursor.limit(1);
-				
-				
+				cursor.limit(35);
+								
 				cursor.each(function(err, doc) 
 				{
 				    if (err) 
@@ -153,12 +169,46 @@ sp.on("open", function () {
 						var x = doc.X;
 						var y = doc.Y;
 						
-						console.log('Fetched:', judge);
+						//console.log('Fetched:', judge);
 						
-						io.emit("chat message", id + '//' + time + '//' + judge + '//' + x + '//' + y + '//' + temp);
+						if(id == 0)
+						{
+							msg0 = msg0 + '[' + time + ']' + '(' + temp + ')';
+							io.emit("data from sensor 0", msg0);
+						}
+						else if(id == 1)
+						{
+							msg1 = msg1 + '[' + time + ']' + '(' + temp + ')';
+							io.emit("data from sensor 1", msg1);
+						}
+						else if(id == 2)
+						{
+							msg2 = msg2 + '[' + time + ']' + '(' + temp + ')';
+							io.emit("data from sensor 2", msg2);
+						}
+						else if(id == 3)
+						{
+							msg3 = msg3 + '[' + time + ']' + '(' + temp + ')';
+							io.emit("data from sensor 3", msg3);
+						}
+						else if(id == 9)
+						{
+							msgA = msgA + '[' + time + ']' + '(' + temp + ')';
+							io.emit("average temperature", msgA);
+						}
 				    }
 				
 				});
+				
+				
+				//console.log('======hahahahahahhah==========', msg0);				
+				//msg0 = 'changed'; 
+				//msg1 = '1';
+				//msg2 = '2';
+				//msg3 = '3';
+				//msgA = 'A';
+	
+	
 				
 				//db.close();
 			
