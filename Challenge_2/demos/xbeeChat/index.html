@@ -1,0 +1,457 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Temperature Monitor</title>
+    
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script type = "text/javascript" src = "xBeechat.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
+    <script type="text/javascript" src="./uvcharts.min.js"></script>
+    <script type="text/javascript" src="./canvasjs.min.js"></script>
+    <script type="text/javascript">
+      
+
+      var socket = io();
+
+      var dps_H = 
+      [
+      /*
+            {x: 1, y: 10}, 
+            {x: 2, y: 13}, 
+            {x: 3, y: 18}, 
+            {x: 4, y: 20}, 
+            {x: 5, y: 17},
+            {x: 6, y: 10}, 
+            {x: 7, y: 13}, 
+            {x: 8, y: 18}, 
+            {x: 9, y: 20}, 
+            {x: 10, y: 17}
+      */
+      ];   //dataPoints. 
+
+	  // For current temperature data
+	  var dps_c = 
+	  [
+		{label: "sensor0", y: 10},
+		{label: "sensor1", y: 10},
+		{label: "sensor2", y: 10},
+		{label: "sensor3", y: 10},
+		{label: "Average", y: 10}
+	  ];
+	  
+      // Buffer
+      var history_time = new Array();
+      var history_temp = new Array();
+
+      var temp_temperature = new Array(0.0, 0.0, 0.0, 0.0, 0.0);
+
+      var count = 0;
+
+      // Fake msg for UI test
+      var msg_fake = new Array(10);
+      msg_fake[0] = "[22:13:35][24.36][5]";
+      msg_fake[1] = "[22:15:44][19.05][9]";
+      msg_fake[2] = "[22:13:44][17.17][5]";
+      msg_fake[3] = "[22:14:01][25.73][8]";
+      msg_fake[4] = "[22:14:20][24.89][5]";
+      msg_fake[5] = "[22:14:50][28.70][9]";
+      msg_fake[6] = "[22:14:35][22.11][9]";
+      msg_fake[7] = "[22:15:11][24.95][5]";
+      msg_fake[8] = "[22:15:30][17.80][9]";
+      msg_fake[9] = "[22:13:24][22.40][5]";
+
+      var xVal = dps_H.length + 1;
+      var yVal = 15;    
+      var updateInterval = 1000;
+
+      var chart;
+	  
+	  var bar_chart;
+
+      window.onload = function () 
+      {
+            //alert("onload");
+
+            chart = new CanvasJS.Chart("chartContainer",{
+                  title :{
+                        text: "Temperature"
+                  },
+                  axisX: {                                  
+                        title: "Seconds After the Requested time"
+                  },
+                  axisY: {                                  
+                        title: "Centigrade"
+                  },
+                  data: [{
+                        type: "line",
+                        dataPoints : dps_H
+                  }]
+            });
+
+			bar_chart = new CanvasJS.Chart("chartContainer_C",{			
+				title: {
+					text: "Temperature of Each Sensor"		
+				},
+				axisY: {				
+					suffix: " C"
+				},		
+				legend :{
+					verticalAlign: 'bottom',
+					horizontalAlign: "center"
+				},
+				data: [
+					{
+						type: "column",	
+						bevelEnabled: true,				
+						indexLabel: "{y} C",
+						dataPoints: dps_c					
+					}
+				]
+			});
+			
+			//alert("daolno");
+			
+            chart.render();
+			
+			bar_chart.render();
+
+            //setInterval(function(){updateChart()}, updateInterval); 
+      }
+	  
+      var updateChart = function () 
+      {
+            //alert("updateChart");
+
+            /*
+            yVal = yVal +  Math.round(5 + Math.random() *(-5-5));
+            dps.push({x: xVal, y: yVal});
+                  
+            xVal++;
+            if (dps.length >  10 )
+            {
+                  dps.shift();                        
+            }
+            */
+            chart.render();         
+
+            // update chart after specified time. 
+
+      };
+
+      function getHistory()
+      {
+            //alert("Get History");
+
+            var sensor = document.getElementById("SensorSelect").value;
+
+            var d = new Date();
+
+            var hour = parseInt(document.getElementById("InputHour").value);
+
+            var minute = parseInt(document.getElementById("InputMinute").value);
+
+            var second = parseInt(document.getElementById("InputSecond").value);
+
+            // Check Input
+            if( (hour > 23) || (hour < 0) || (minute > 59) || (minute < 0) || (second > 59) || (second < 0))
+            {
+                  alert("Invalid Time Input (/=A=)/┻━┻");
+
+                  return;
+            }
+
+            d.setHours(hour);
+            d.setMinutes(minute);
+            d.setSeconds(second);
+
+            var time = d.getTime();
+
+            var msg = "[" + sensor + "][" + time + "]";
+
+            document.getElementById("title").innerHTML = "Historical Data of Sensor " + sensor + ":";
+
+			socket.emit('chat message', msg);
+			
+            //alert(msg);
+      }
+
+      // As a replkacement for incoming message, only for UI test
+      function myFunction(id)
+      {          
+            //alert("Button " + id + " onclick");
+
+            var jinke = 5;
+
+            var la;
+
+            var time;
+
+            var Time = new Array(10);
+
+            var Temp = new Array(10);
+
+            var time_base;
+
+            var count = 0;
+
+            // Clear dps
+            while(dps_H.length >  0 )
+            {
+                  dps_H.shift();                        
+            }
+
+            //alert("lll");
+
+            //updateChart();
+
+            for(var i = 0; i<10; i++)
+            {
+                  // simulate handling incoming message
+                  // parsing msg
+                  la = parseInt(msg_fake[i].substring(18, (msg_fake[i].length - 1)));
+                  time = msg_fake[i].substring(1, 9);
+                  temp = parseFloat(msg_fake[i].substring(11, 16));
+
+                  //alert(time + "==" + temp + "==" + la);
+
+                  if(jinke == la)
+                  {
+                        // Insert the valid data to buffer
+                        Time[count] = (parseInt(time.substring(0, 2)) * 3600) + (parseInt(time.substring(3, 5)) * 60) + parseInt(time.substring(6, 8));
+
+                        Temp[count] = temp;
+
+                        count++;
+                  }
+
+                  if(count == jinke)
+                  {
+                        break;
+                  }
+
+            }
+
+            // Sort the data according to time
+            for (var m = 0; m < count - 1; m++)// 控制趟数  
+            {
+                  for (var n = 0; n < count - m - 1; n++)  
+                  {
+                        if (Time[n] > Time[n + 1]) 
+                        {  
+                              var tmp_time = Time[n];
+                              var tmp_temp = Temp[n];
+
+                              // Swap time
+                              Time[n] = Time[n + 1];  
+                              Time[n + 1] = tmp_time;
+                              // Swap temperature
+                              Temp[n] = Temp[n + 1];
+                              Temp[n + 1] = tmp_temp;
+
+                        }  
+                  }  
+            }   
+                  
+
+            // Insert sorted data to the chart
+            for(var j = 0; j<count; j++)
+            {
+                  xVal = Time[j] - Time[0];
+                  yVal = Temp[j];
+
+                  //alert(xVal + "  " + yVal);
+
+                  dps_H.push({x: xVal, y: yVal});
+            }
+            //dps.push({x: xVal, y: yVal});
+
+            updateChart();
+
+      }
+
+      /*
+      $('form').submit(function(){
+        socket.emit('chat message', $('#m').val());
+        $('#m').val('');
+        return false;
+      });
+      */
+
+      // Handle Incoming Messages
+      socket.on('chat message', function(msg)
+      {
+        //$('#messages').append($('<li>').text(msg));
+        alert(msg);
+
+      });
+
+      socket.on('end of history', function(msg)
+      {
+        //$('#messages').append($('<li>').text(msg));
+		//alert("End of History");
+		
+        var xVal;
+        var yVal;
+
+        var time_base;
+
+        // sort the data according to the time
+        for (var m = 0; m < count; m++)// 控制趟数  
+        {
+          for (var n = 0; n < count - m; n++)  
+          {
+            if (history_time[n] > history_time[n + 1]) 
+            {  
+              var tmp_time = history_time[n];
+              var tmp_temp = history_temp[n];
+
+              // Swap time
+              history_time[n] = history_time[n + 1];  
+              history_time[n + 1] = tmp_time;
+                              
+              // Swap temperature
+              history_temp[n] = history_temp[n + 1];
+              history_temp[n + 1] = tmp_temp;
+
+            }  
+          }  
+        }
+
+        // plot the data
+        // Clear dps
+        while(dps_H.length >  0 )
+        {
+          dps_H.shift();                        
+        }
+
+        // Insert sorted data to the chart
+        for(var j = 0; j<count; j++)
+        {
+          xVal = history_time[j] - history_time[0];
+          yVal = history_temp[j];
+
+          //alert(xVal + "  " + yVal);
+
+          dps_H.push({x: xVal, y: yVal});
+        }
+        
+        updateChart();
+
+        // Clear the buffer
+        history_time.splice(0, count);
+
+        count = 0;
+      });
+
+      socket.on('history', function(msg)
+      {
+        //$('#messages').append($('<li>').text(msg));
+		//alert("History: " + msg);
+		
+        time = msg.substring(1, 9);
+        temp = parseFloat(msg.substring(11, 16));
+
+        history_time[count] = (parseInt(time.substring(0, 2)) * 3600) + (parseInt(time.substring(3, 5)) * 60) + parseInt(time.substring(6, 8));
+        history_temp[count] = temp;
+
+        count = count + 1;
+      });
+
+      socket.on('temp message', function(msg)
+      {
+        //$('#messages').append($('<li>').text(msg));
+		alert("temp message: " + msg);
+		
+		var xVal;
+		
+		var yVal;
+		
+		var sensorColor;
+		
+        var id = parseInt(msg.substring(1,2));
+
+        var sum = 0;
+
+		temp_temperature[id] = parseFloat(msg.substring(4, msg.length - 1));
+
+		
+        for(var i = 0; i<4; i++)
+        {
+          sum = sum + temp_temperature[i];
+        }
+
+        temp_temperature[4] = (sum / 4);
+		
+        // Refresh present data
+		for(var j = 0; j<5; j++)
+        {
+          xVal = j;
+		  yVal = temp_temperature[j];
+		  
+		  sensorColor = yVal > 30 ? "#FF2500":yVal >= 20 ? "#FF6000":yVal < 20 ? "#6B8E23 ":null;
+		  
+		  if(j == 4)
+		  {
+			dps_c[j] = {label: "Average" , y: yVal, color: sensorColor};
+		  }
+		  else
+		  {
+		    dps_c[j] = {label: "sensor"+(j+1) , y: yVal, color: sensorColor};
+		  }
+        }
+		
+		
+		bar_chart.render();
+		
+		//updateChart();
+      });
+
+    </script>
+
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <!--
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+    -->
+
+    <!-- ================================= -->
+	<div id="chartContainer_C" style="height: 300px; width: 100%;"></div>
+    Sensor:<select id = "SensorSelect">
+            <option value="0">Sensor_0</option>
+            <option value="1">Sensor_1</option>
+            <option value="2">Sensor_2</option>
+            <option value="3">Sensor_3</option>
+            <option value="9">Average</option>
+    </select> Time:<input type="text" id="InputHour" value="">:<input type="text" id="InputMinute" value="">:<input type="text" id="InputSecond" value=""><button onclick="getHistory()">Historical Data</button>
+    <p id="title"></p>
+    <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+    
+    
+    <button onclick="myFunction(0)">Click me to Test</button>
+    
+
+    <!-- ================================= -->
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+    </script>
+    <script>
+      
+    </script>
+  </body>
+</html>
