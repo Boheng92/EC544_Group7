@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
+    <script type="text/javascript" src="./uvcharts.min.js"></script>
+    <script type="text/javascript" src="./canvasjs.min.js"></script>
+  </head>
+
+  <body>
+    <div id="chartContainer" style="height: 300px; width: 100%;">
+    </div>
+	<div id="id01"></div>
+
+  </body>
+
+    <script>
+	var k =[];
+
+    window.onload = function () {
+		
+		
+		//initial value of dataPoints 
+		var dps = [
+		{label: "sensor1", y: 22},
+		{label: "sensor2", y: 13},
+		{label: "sensor3", y: 3},
+		{label: "sensor4", y: 33},
+		{label: "sensor5", y: 20}
+		];	
+
+		var chart = new CanvasJS.Chart("chartContainer",{			
+			title: {
+				text: "Temperature of Each Sensor"		
+			},
+			axisY: {				
+				suffix: " C"
+			},		
+			legend :{
+				verticalAlign: 'bottom',
+				horizontalAlign: "center"
+			},
+			data: [
+			{
+				type: "column",	
+				bevelEnabled: true,				
+				indexLabel: "{y} C",
+				dataPoints: dps					
+			}
+			]
+		});
+
+		
+		var updateInterval = 1000;	
+		
+
+		var updateChart = function () {
+             //we might not need a for loop in actual case
+			for (var i = 0; i < dps.length; i++) {
+ 				
+ 				// generating random variation deltaY
+ 				var deltaY = Math.round(2 + Math.random() *(-2-2));				
+ 				var yVal = deltaY + dps[i].y > 0 ? dps[i].y + deltaY : 0;
+				var sensorColor;
+                //actual code will be something like this
+				//
+				//if( new value is for sensor 1)
+				//var yVal = sensor 1 data
+                
+				// color of dataPoint dependent upon y value. 
+
+				sensorColor =
+				yVal > 30 ? "#FF2500":
+				yVal >= 20 ? "#FF6000":
+				yVal < 20 ? "#6B8E23 ":							
+ 				null;
+ 
+ 
+ 				// updating the dataPoint
+ 				dps[i] = {label: "sensor"+(i+1) , y: yVal, color: sensorColor};
+ 
+ 			};
+ 
+ 			chart.render();
+ 		};
+ 		
+ 		updateChart();		
+    
+ 		// update chart after specified interval 
+ 		setInterval(function(){updateChart()}, updateInterval);
+	
+ 	}
+	
+	
+</script>
+<script src="myTutorials.js"></script>
+</html>
