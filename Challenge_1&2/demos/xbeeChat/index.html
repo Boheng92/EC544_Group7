@@ -33,11 +33,11 @@
 	  // For current temperature data
 	  var dps_c = 
 	  [
-		{label: "sensor0", y: 10},
-		{label: "sensor1", y: 10},
-		{label: "sensor2", y: 10},
-		{label: "sensor3", y: 10},
-		{label: "Average", y: 10}
+		{label: "sensor0", y: 0},
+		{label: "sensor1", y: 0},
+		{label: "sensor2", y: 0},
+		{label: "sensor3", y: 0},
+		{label: "Average", y: 0}
 	  ];
 	  
       // Buffer
@@ -282,7 +282,7 @@
       socket.on('chat message', function(msg)
       {
         //$('#messages').append($('<li>').text(msg));
-        alert(msg);
+        //alert(msg);
 
       });
 
@@ -361,7 +361,7 @@
       socket.on('temp message', function(msg)
       {
         //$('#messages').append($('<li>').text(msg));
-		alert("temp message: " + msg);
+		//alert("temp message: " + msg);
 		
 		var xVal;
 		
