@@ -59,8 +59,13 @@
 		//防止A某秀手速
 		button.disabled = true;
 		
+		
+		
 		if(button.value == "ON")
 		{
+			//修改button字符
+			button.value = "OFF";
+			
 			//构造信息
 			m = "B";
 			//发送
@@ -69,7 +74,7 @@
 		}
 		else if(button.value == "OFF")
 		{
-			//button.value = "ON";
+			button.value = "ON";
 			
 			m = "A";
 	
@@ -82,15 +87,14 @@
 		button = document.getElementById("b1");
 		button.disabled = true;
 		
-		
 		if(button.value == "ON"){
-			//button.value = "OFF";
+			button.value = "OFF";
 			m = "D";
 			socket.emit('control message', m);
 		
 		}
 		else if(button.value == "OFF"){
-			//button.value = "ON";
+			button.value = "ON";
 			m = "C";
 			socket.emit('control message', m);			
 		}		
@@ -101,13 +105,13 @@
 		button.disabled = true;
 								
 		if(button.value == "ON"){
-			//button.value = "OFF";
+			button.value = "OFF";
 			m = "F";
 			socket.emit('control message', m);
 		
 		}
 		else if(button.value == "OFF"){
-			//button.value = "ON";
+			button.value = "ON";
 			m = "E";
 			socket.emit('control message', m);			
 		}	
@@ -118,21 +122,17 @@
 		button.disabled = true;
 		
 		if(button.value == "ON"){
-			//button.value = "OFF";
+			button.value = "OFF";
 			m = "H";
 			socket.emit('control message', m);
 		
 		}
 		else if(button.value == "OFF"){
-			//button.value = "ON";
+			button.value = "ON";
 			m = "G";
 			socket.emit('control message', m);			
 		}	
 	}
-	
-	//sleep(5000);
-		
-	button.disabled = false;
   }
   
 </script>
@@ -170,16 +170,10 @@
 		button = document.getElementById("b0");
 	
 		//仅对确认信息进行操作
-		if(val == "A")
+		if(val == "A" || val == "B")
 		{
-			// OFF ACK
-			//修改对应按键字符
-			button.value = "ON";
-		}
-		else if( val == "B")
-		{
-			// ON ACK
-			button.value = "OFF";
+			//重新启用对应button
+			button.disabled = false;
 		}
 		
 		id = "";
@@ -190,16 +184,8 @@
 		//alert("msg1");
 	
 		button = document.getElementById("b1");
-		if(val == "C")
-		{
-			// OFF ACK
-			//修改对应按键字符
-			button.value = "ON";
-		}
-		else if( val == "D")
-		{
-			// ON ACK
-			button.value = "OFF";
+		if(val == "C" || val == "D"){
+			button.disabled = false;
 		}
 
 		id = "";
@@ -210,16 +196,8 @@
 		//alert("msg2");
 	
 		button = document.getElementById("b2");
-		if(val == "E")
-		{
-			// OFF ACK
-			//修改对应按键字符
-			button.value = "ON";
-		}
-		else if( val == "F")
-		{
-			// ON ACK
-			button.value = "OFF";
+		if(val == "E" || val == "F"){
+			button.disabled = false;
 		}
 
 		id = "";
@@ -230,16 +208,8 @@
 		//alert("msg3");
 	
 		button = document.getElementById("b3");
-		if(val == "G")
-		{
-			// OFF ACK
-			//修改对应按键字符
-			button.value = "ON";
-		}
-		else if( val == "H")
-		{
-			// ON ACK
-			button.value = "OFF";
+		if(val == "G" || val == "H"){
+			button.disabled = false;
 		}		
 		
 		id = "";

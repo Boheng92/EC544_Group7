@@ -22,8 +22,9 @@ io.on('connection', function(socket){
   socket.on('disconnect', function(){
   }); 
   
-  socket.on('chat message', function(msg){
-    io.emit('chat message', msg);
+  socket.on('control message', function(msg){
+    io.emit('control message', msg);
+	console.log('data sent: ' + msg);
     sp.write(msg + "\n");
   });
 });
@@ -36,6 +37,6 @@ sp.on("open", function () {
   console.log('open');
   sp.on('data', function(data) {
     console.log('data received: ' + data);
-    io.emit("chat message", "An XBee says: " + data);
+    io.emit("ack message", data);
   });
 });
